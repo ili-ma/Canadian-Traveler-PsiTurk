@@ -1,0 +1,5 @@
+.psiturk_history
+*.csv
+*.db
+__pycache__/
+static/index.html

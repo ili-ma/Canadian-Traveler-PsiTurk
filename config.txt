@@ -1,0 +1,55 @@
+[HIT Configuration]
+title = Traveling Sheep
+description = Solve puzzles to navigate to a goal in as few clicks as possible.
+amt_keywords = game, puzzle, navigation, study, research, sheep
+# Lifetime is the expiry of the HIT in hours. After this much time the HIT no longer shows up in searches.
+lifetime = 720
+us_only = false
+approve_requirement = 75
+number_hits_approved = 4
+require_master_workers = false
+contact_email_on_error = gureckislab@gmail.com
+ad_group = Traveling Sheep
+psiturk_keywords = canadian traveler
+organization_name = New York University
+browser_exclude_rule = MSIE, mobile, tablet
+allow_repeats = false
+blacklist_qualification_ids = 31O6ZS77URK69W7UXXZQ1RTK5ZU7W3
+
+[Database Parameters]
+database_url = sqlite:///participants.db
+table_name = sheeptask
+
+[Server Parameters]
+host = 0.0.0.0
+port = 22362
+cutoff_time = 30
+logfile = server.log
+loglevel = 2
+debug = true
+login_username = shaun
+login_pw = ReleaseTheSheep!
+threads = 1
+secret_key = 'not using a key but also not sure how to disable key use altogether'
+#certfile = <path_to.crt> 
+#keyfile = <path_to.key>
+#adserver_revproxy_host = www.location.of.your.revproxy.sans.protocol.com
+#adserver_revproxy_port = 80 # defaults to 80
+#server_timeout = 30
+
+[Task Parameters]
+experiment_code_version = 1.0
+num_conds = 1
+num_counters = 1
+
+[Shell Parameters]
+launch_in_sandbox_mode = true
+persistent_history_file = .psiturk_history
+bonus_message = "Thank ewe for participating! 🎉🐑"
+
+# If you are not using the psiturk ad server, set `use_psiturk_ad_server` to `false` and point `ad_location` to your proxy server <host> and <port>. Format the ad_location like this:
+#
+#   https://<host>:<port>/ad 
+
+use_psiturk_ad_server = false
+ad_location = https://sheep-task.herokuapp.com/pub

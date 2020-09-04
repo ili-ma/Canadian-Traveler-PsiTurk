@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- 
+	The ad.html has a very specific format.
+
+	Really there are two "ads" contained within this file.
+
+	The first ad displays to participants who are browsing
+	the Amazon Mechanical Turk site but have not yet accepted
+	your hit.  
+
+	The second part of the ad display after the person selected
+	"Accept HIT" on the Amazon website.  This will reload the
+	ad and will display a button which, when clicked, will pop
+	open a new browser window pointed at your local psiTurk
+	server (assuming it is running and accessible to the Internet).
+
+	See comments throughout for hints
+
+-->
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Traveling Sheep Task - Ad</title>
+		<link rel="stylesheet" href="/static/style.css" type="text/css" />
+		<link rel="icon" href="/static/favicon.ico" />
+	</head>
+	<body>
+		<!-- 
+			If assignmentid is "ASSIGNMENT_ID_NOT_AVAILABLE"
+			it means the participant has NOT accepted your hit. 
+			This should display the typical advertisement about
+			your experiment: who can participate, what the
+			payment is, the time, etc...
+		-->
+		{% if assignmentid == "ASSIGNMENT_ID_NOT_AVAILABLE" %}
+
+			<script src="/static/UnityProgress.js"></script>
+			<script src="/static/Build/UnityLoader.js"></script>
+			<div id="webgl-content">
+				<div id="unityContainer" style="width: 960px; height: 600px"></div>
+				<div class="footer">
+					<p id="progress"></p>
+					<div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
+					<div class="title">Make Fullscreen</div>
+				</div>
+			</div>
+			<script>
+				var RuleVariant = "TwoStage";
+				var isPreview = true;
+				var unityInstance = UnityLoader.instantiate("unityContainer", "/static/Build/static.json", {onProgress: UnityProgress});
+			</script>
+
+		{% else %}
+
+			<script type="text/javascript">
+				function launchTask() {
+					window.open(
+						"{{ server_location }}/consent?hitId={{ hitid }}&assignmentId={{ assignmentid }}&workerId={{ workerid }}&mode={{ mode }}",
+						"Popup",
+						"toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=no,width=1024,height=700",
+					);
+				}
+			</script>
+			<h1>Thank you for accepting this HIT!</h1>
+			<p>
+				Please click the button below to launch the task in a new window:<br>
+				<br>
+				<button type="button" class="btn-primary" onClick="launchTask();">
+				  Begin Task
+				</button><br>
+				<br>
+				If the button does not work you can use the link below.<br>
+				The task might not fit in this frame so to avoid scrolling we do advise launching it in a separate window or tab.<br>
+				<br>
+				<a href="{{ server_location }}/consent?hitId={{ hitid }}&assignmentId={{ assignmentid }}&workerId={{ workerid }}&mode={{ mode }}" target="_blank">
+					{{ server_location }}/consent?hitId={{ hitid }}&assignmentId={{ assignmentid }}&workerId={{ workerid }}&mode={{ mode }}
+				</a>
+			</p>
+
+		{% endif %}
+	</body>
+</html>

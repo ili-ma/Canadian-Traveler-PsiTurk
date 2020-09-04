@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Traveling Sheep Task</title>
+		<link rel="stylesheet" href="/static/style.css" type="text/css" />
+		<link rel="icon" href="/static/favicon.ico" />
+		<script type="text/javascript">
+			// These fields provided by the psiTurk Server
+			var uniqueId = "{{ uniqueId }}"; // a unique string identifying the worker/task
+			var condition = {{ condition }}; // the condition number
+			var counterbalance = {{ counterbalance }}; // a number indexing counterbalancing conditions
+			var adServerLoc = "{{ adServerLoc }}"; // the location of your ad (so you can send user back at end of experiment)
+			var mode = "{{ mode }}";
+
+			function taskEnded()
+			{
+				$("#webgl-content").css("display", "none");
+				$("#qualtrics-frame").attr("src", "https://nyu.qualtrics.com/jfe/form/SV_5uW2sa2HTS5qxCZ?uniqueID={{ uniqueId }}");
+				$("#qualtrics-frame").css("display", "unset");
+				psiTurk.recordTrialData({'phase':'postquestionnaire', 'status':'begin'});
+			}
+
+			window.onmessage = (event) => {
+				if (typeof event.data === "string" && event.data.includes("QualtricsEOS")) {
+					$("#webgl-content").css("display", "table");
+					$("#qualtrics-frame").css("display", "none");
+					$("#submit-button").attr("class", "btn-primary");
+					psiTurk.recordTrialData({'phase':'postquestionnaire', 'status':'back_from_qualtrics'});
+					let q_message_array = event.data.split('|');
+					psiTurk.recordUnstructuredData('qualtrics_session_id', q_message_array[2]);
+				}
+			};
+
+			function submit()
+			{
+				try {
+					psiTurk.recordUnstructuredData('Submitted');
+				} catch (err) {}
+				psiTurk.saveData({
+					success: () => psiTurk.computeBonus('compute_bonus', () => psiTurk.completeHIT()),
+					error: () => setTimeout(submit, 5000)
+				});
+			}
+		</script>
+		<!-- Psiturk dependencies -->
+		<script src="/static/lib/jquery-min.js" type="text/javascript"> </script>
+		<script src="/static/lib/underscore-min.js" type="text/javascript"> </script>
+		<script src="/static/lib/backbone-min.js" type="text/javascript"> </script>
+		<!-- psiturk.js provides the basic psiturk functionality -->
+		<script src="/static/js/psiturk.js" type="text/javascript"> </script>
+	</head>
+	<body>
+		<script src="/static/UnityProgress.js"></script>
+		<script src="/static/Build/UnityLoader.js"></script>
+		<div id="content-wrapper">
+			<div id="webgl-content">
+				<div id="unityContainer" style="width: 960px; height: 600px"></div>
+				<div class="footer">
+					<p id="progress"></p>
+					<div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
+					<div class="title">Make Fullscreen</div>
+					<!-- <p>Optional: Type any feedback you would like to share</p>
+					<textarea rows="5" cols="80" name="Feedback" id="feedbackField"></textarea> -->
+					<p>Please email <a href="mailto:gureckislab@gmail.com" target="_blank">gureckislab@gmail.com</a> if you experience any problems with this HIT</p>
+				</div>
+			</div>
+			<!-- The source is not filled out until we present the questionnaire -->
+			<iframe id="qualtrics-frame" src="">
+				If the questionnaire doesn't show please use this link.<br>
+				<br>
+				<a href="https://nyu.qualtrics.com/jfe/form/SV_5uW2sa2HTS5qxCZ?uniqueID={{ uniqueId }}" target="_blank">
+					https://nyu.qualtrics.com/jfe/form/SV_5uW2sa2HTS5qxCZ?uniqueID={{ uniqueId }}
+				</a>
+			</iframe>
+		</div>
+		<div id="page-footer">
+			<button type="button" id="submit-button" onclick="submit();">
+				Submit
+			</button>
+		</div>
+		<script>
+			var RuleVariant = "TwoStage";
+			var isPreview = false;
+			var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode);
+			// PsiTurk considers a participant hasn't started until they have finished the instruction.
+			// We want psiTurk to treat them as started right away to get the refresh/page close protection.
+			psiTurk.finishInstructions();
+			var unityInstance = UnityLoader.instantiate("unityContainer", "/static/Build/static.json", {onProgress: UnityProgress});
+		</script>
+	</body>
+</html>

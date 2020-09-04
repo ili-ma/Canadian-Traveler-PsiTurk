@@ -1,0 +1,13 @@
+<html>
+	<body>
+		<h1>Result of {{ action.name }}</h1>
+
+		{% for outcome in action.outcomes: %}
+			<div>
+				{{ outcome }}
+			</div>
+		{% endfor %}
+		
+		<button type="button" onclick="window.location += '&doit=true';">Do it</button>
+	</body>
+</html>
