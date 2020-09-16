@@ -12,8 +12,15 @@
 			var counterbalance = {{ counterbalance }}; // a number indexing counterbalancing conditions
 			var adServerLoc = "{{ adServerLoc }}"; // the location of your ad (so you can send user back at end of experiment)
 			var mode = "{{ mode }}";
+			var taskStarted = false;
 
-			function taskEnded()
+			function onTaskStart()
+			{
+				taskStarted = true;
+				psiTurk.finishInstructions();
+			}
+
+			function onTaskEnd()
 			{
 				$("#webgl-content").css("display", "none");
 				$("#qualtrics-frame").attr("src", "https://nyu.qualtrics.com/jfe/form/SV_5uW2sa2HTS5qxCZ?uniqueID={{ uniqueId }}");
@@ -34,13 +41,19 @@
 
 			function submit()
 			{
+				let submitOk = taskStarted;
+				if (!submitOk) {
+					submitOk = confirm("You are still viewing instructions. If you submit now the hit will be rejected. Press CANCEL and continue the task or return the hit. Press OK to submit anyway.");
+				}
 				try {
-					psiTurk.recordUnstructuredData('Submitted');
+					psiTurk.recordUnstructuredData('Submitted', submitOk);
 				} catch (err) {}
-				psiTurk.saveData({
-					success: () => psiTurk.computeBonus('compute_bonus', () => psiTurk.completeHIT()),
-					error: () => setTimeout(submit, 5000)
-				});
+				if (submitOk) {
+					psiTurk.saveData({
+						success: () => psiTurk.computeBonus('compute_bonus', () => psiTurk.completeHIT()),
+						error: () => setTimeout(submit, 5000)
+					});
+				}
 			}
 		</script>
 		<!-- Psiturk dependencies -->
@@ -83,9 +96,6 @@
 			var RuleVariant = "TwoStage";
 			var isPreview = false;
 			var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode);
-			// PsiTurk considers a participant hasn't started until they have finished the instruction.
-			// We want psiTurk to treat them as started right away to get the refresh/page close protection.
-			psiTurk.finishInstructions();
 			var unityInstance = UnityLoader.instantiate("unityContainer", "/static/Build/static.json", {onProgress: UnityProgress});
 		</script>
 	</body>
