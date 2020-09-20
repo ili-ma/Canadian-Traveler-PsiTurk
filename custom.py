@@ -114,7 +114,7 @@ def compute_bonus():
     try:
         # lookup user in database
         user = Participant.query.filter(Participant.uniqueid == uniqueId).one()
-        user_data = loads(user.datastring)  # load datastring from JSON
+        user_data = loads(user.datastring) if user.datastring else {"data": []} # load datastring from JSON
         
         outcomes = []
         nGames = 85
